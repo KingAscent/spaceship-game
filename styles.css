@@ -1,0 +1,8 @@
+body{
+    text-align: center;
+    overflow: hidden; /* To hide the scrollbar */
+}
+
+#gameCanvas{
+    border: 4px solid #ffbb00;
+}
