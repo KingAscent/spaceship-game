@@ -10,13 +10,28 @@ let rightPressed = false;
 
 // Spaceship drawing
 var spaceship = new Image();
-spaceship.src = "src/PLACEHOLDER-spaceship.gif";
+spaceship.src = "src/spaceship.png";
 
 function drawGame(){
     requestAnimationFrame(drawGame);
     clearScreen();
     inputs();
+    collision();
     drawSpaceship();
+}
+
+function collision(){
+    // Check boundaries of canvas first
+    if(y < 0)
+        y = 0;
+    if(canvas.height - 50 < y)
+        y = canvas.height - 50;
+    if(x < 0)
+        x = 0;
+    if(canvas.width - 91 < x)
+        x = canvas.width - 91;
+    
+    //TODO: COLLISION BETWEEN SHIP AND ENVIRONMENT
 }
 
 function drawSpaceship(){
@@ -24,7 +39,7 @@ function drawSpaceship(){
 }
 
 function clearScreen(){
-    ctx.fillStyle = "black";
+    ctx.fillStyle = "blue";
     ctx.fillRect(0, 0, canvas.clientWidth, canvas.clientHeight);
 }
 
