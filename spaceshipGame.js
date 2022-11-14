@@ -1,8 +1,16 @@
+/*
+ *TODO:
+ * clearScreen method audio turned off to mute while testing
+ */
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
+var audio = new Audio("src/Stay Alive Flying.mp3");
+
+let wallX = 1000;
+let wallY = 650;
 let x = 100;
 let y = 100;
-let speed = 10;
+let speed = 5;
 let upPressed = false;
 let downPressed = false;
 let leftPressed = false;
@@ -17,7 +25,21 @@ function drawGame(){
     clearScreen();
     inputs();
     collision();
+    drawWall();
     drawSpaceship();
+}
+
+
+function drawWall(){
+    ctx.fillStyle = '#ffbb00'
+    this.x = wallX;
+    this.y = wallY;
+    ctx.fillRect(this.x, this.y, 70, 70);
+    wallX -= 2;
+    if(wallX == 0){
+        wallX = 1000;
+        wallY = Math.floor(Math.random() * 600);
+    }
 }
 
 function collision(){
@@ -39,6 +61,7 @@ function drawSpaceship(){
 }
 
 function clearScreen(){
+//    audio.play(); // Plays the music from the top of the code
     ctx.fillStyle = "blue";
     ctx.fillRect(0, 0, canvas.clientWidth, canvas.clientHeight);
 }
