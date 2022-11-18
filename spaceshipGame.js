@@ -1,13 +1,14 @@
 /*
  *TODO:
  * clearScreen method audio turned off to mute while testing
+ * Clean code before implementing more changes
+ * -Namely, focus on an array or set of some sort
+ * -to make calling the coords for walls/meteors simpler
  */
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 var audio = new Audio("src/Stay Alive Flying.mp3");
 
-let wallX = 1000;
-let wallY = 650;
 let x = 100;
 let y = 100;
 let speed = 5;
@@ -16,6 +17,8 @@ let downPressed = false;
 let leftPressed = false;
 let rightPressed = false;
 
+const wallCoords = new Map();
+wallCoords.set('Meteor', [1000, 650]);
 // Spaceship drawing
 var spaceship = new Image();
 spaceship.src = "src/spaceship.png";
@@ -37,7 +40,7 @@ function drawMeteor(){
     ctx.beginPath();
     ctx.arc(this.x, this.y, 20, 0, Math.PI * 2);
     ctx.fill();
-    wallX -= 2;
+    wallX -= 5;
     if(wallX <= 0){
         wallX = 1000;
         wallY = Math.floor(Math.random() * 600);
@@ -46,14 +49,18 @@ function drawMeteor(){
 
 function drawWall(){
     ctx.fillStyle = '#ffbb00'
-    this.x = wallX;
-    this.y = wallY;
+    this.x = wallCoords.get('Meteor')[0];
+    this.y = wallCoords.get('Meteor')[1];
     ctx.fillRect(this.x, this.y, 70, 70);
-    wallX -= 2;
-    if(wallX <= 0){
-        wallX = 1000;
-        wallY = Math.floor(Math.random() * 600);
+    this.x -= 2;
+    wallCoords.set('Meteor', [this.x, this.y]);
+    if(this.x <= 0){
+        resetWall();
     }
+}
+
+function resetWall(){
+    wallCoords.set('Meteor', [1000, Math.floor(Math.random() * 600)]);
 }
 
 function collision(){
@@ -66,14 +73,17 @@ function collision(){
         x = 0;
     if(canvas.width - 91 < x)
         x = canvas.width - 91;
+    wallCollision();
+}
 
+function wallCollision(){
+    this.x = wallCoords.get('Meteor')[0];
+    this.y = wallCoords.get('Meteor')[1];
     // Collision between wall & ship
-    if(wallX - 81 <= x && x <= wallX + 60 &&
-       wallY <= y + 30 && y <= wallY + 60){
-        x = 70;
-        y = 300;
+    if(this.x - 81 <= x && x <= this.x + 60 &&
+       this.y <= y + 30 && y <= this.y + 60){
+        resetWall();
     }
-    
 }
 
 function drawSpaceship(){
