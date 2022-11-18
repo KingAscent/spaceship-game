@@ -1,3 +1,6 @@
+let wallX = 1000;
+let wallY = 350;
+
 function drawWall(){
     ctx.fillStyle = '#ffbb00'
     this.x = wallX;
@@ -9,3 +12,4 @@ function drawWall(){
         wallY = Math.floor(Math.random() * 600);
     }
 }
+export {drawWall}

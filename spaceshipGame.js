@@ -25,10 +25,24 @@ function drawGame(){
     clearScreen();
     inputs();
     collision();
+//    drawMeteor();
     drawWall();
     drawSpaceship();
 }
 
+function drawMeteor(){
+    ctx.fillStyle = "green";
+    this.x = wallX;
+    this.y = wallY;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, 20, 0, Math.PI * 2);
+    ctx.fill();
+    wallX -= 2;
+    if(wallX <= 0){
+        wallX = 1000;
+        wallY = Math.floor(Math.random() * 600);
+    }
+}
 
 function drawWall(){
     ctx.fillStyle = '#ffbb00'
@@ -36,7 +50,7 @@ function drawWall(){
     this.y = wallY;
     ctx.fillRect(this.x, this.y, 70, 70);
     wallX -= 2;
-    if(wallX == 0){
+    if(wallX <= 0){
         wallX = 1000;
         wallY = Math.floor(Math.random() * 600);
     }
@@ -52,8 +66,14 @@ function collision(){
         x = 0;
     if(canvas.width - 91 < x)
         x = canvas.width - 91;
+
+    // Collision between wall & ship
+    if(wallX - 81 <= x && x <= wallX + 60 &&
+       wallY <= y + 30 && y <= wallY + 60){
+        x = 70;
+        y = 300;
+    }
     
-    //TODO: COLLISION BETWEEN SHIP AND ENVIRONMENT
 }
 
 function drawSpaceship(){
@@ -62,7 +82,7 @@ function drawSpaceship(){
 
 function clearScreen(){
 //    audio.play(); // Plays the music from the top of the code
-    ctx.fillStyle = "blue";
+    ctx.fillStyle = "black";
     ctx.fillRect(0, 0, canvas.clientWidth, canvas.clientHeight);
 }
 
