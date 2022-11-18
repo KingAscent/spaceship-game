@@ -18,7 +18,10 @@ let leftPressed = false;
 let rightPressed = false;
 
 const wallCoords = new Map();
-wallCoords.set('Meteor', [1000, 650]);
+wallCoords.set('Wall', [1000, Math.floor(Math.random() * 600)]);
+const meteorCoords = new Map();
+meteorCoords.set('Meteor', [1000, Math.floor(Math.random() * 600)]);
+
 // Spaceship drawing
 var spaceship = new Image();
 spaceship.src = "src/spaceship.png";
@@ -28,39 +31,42 @@ function drawGame(){
     clearScreen();
     inputs();
     collision();
-//    drawMeteor();
+    drawMeteor();
     drawWall();
     drawSpaceship();
 }
 
 function drawMeteor(){
     ctx.fillStyle = "green";
-    this.x = wallX;
-    this.y = wallY;
+    this.x = meteorCoords.get('Meteor')[0];
+    this.y = meteorCoords.get('Meteor')[1];
     ctx.beginPath();
     ctx.arc(this.x, this.y, 20, 0, Math.PI * 2);
     ctx.fill();
-    wallX -= 5;
-    if(wallX <= 0){
-        wallX = 1000;
-        wallY = Math.floor(Math.random() * 600);
+    this.x -= 5;
+    meteorCoords.set('Meteor', [this.x, this.y]);
+    if(this.x <= 0){
+        resetObstacle('Meteor');
     }
 }
 
 function drawWall(){
     ctx.fillStyle = '#ffbb00'
-    this.x = wallCoords.get('Meteor')[0];
-    this.y = wallCoords.get('Meteor')[1];
+    this.x = wallCoords.get('Wall')[0];
+    this.y = wallCoords.get('Wall')[1];
     ctx.fillRect(this.x, this.y, 70, 70);
     this.x -= 2;
-    wallCoords.set('Meteor', [this.x, this.y]);
+    wallCoords.set('Wall', [this.x, this.y]);
     if(this.x <= 0){
-        resetWall();
+        resetObstacle('Wall');
     }
 }
 
-function resetWall(){
-    wallCoords.set('Meteor', [1000, Math.floor(Math.random() * 600)]);
+function resetObstacle(obstacle){
+    if(obstacle == 'Meteor')
+        meteorCoords.set('Meteor', [1000, Math.floor(Math.random() * 600)]);
+    if(obstacle == 'Wall')
+        wallCoords.set('Wall', [1000, Math.floor(Math.random() * 600)]);
 }
 
 function collision(){
@@ -77,12 +83,12 @@ function collision(){
 }
 
 function wallCollision(){
-    this.x = wallCoords.get('Meteor')[0];
-    this.y = wallCoords.get('Meteor')[1];
+    this.x = wallCoords.get('Wall')[0];
+    this.y = wallCoords.get('Wall')[1];
     // Collision between wall & ship
     if(this.x - 81 <= x && x <= this.x + 60 &&
        this.y <= y + 30 && y <= this.y + 60){
-        resetWall();
+        resetObstacle('Wall');
     }
 }
 
