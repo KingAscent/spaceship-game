@@ -2,8 +2,6 @@
  *TODO:
  * clearScreen method audio turned off to mute while testing
  * Clean code before implementing more changes
- * -Namely, focus on an array or set of some sort
- * -to make calling the coords for walls/meteors simpler
  */
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -17,10 +15,9 @@ let downPressed = false;
 let leftPressed = false;
 let rightPressed = false;
 
-const wallCoords = new Map();
-wallCoords.set('Wall', [1000, Math.floor(Math.random() * 600)]);
-const meteorCoords = new Map();
-meteorCoords.set('Meteor', [1000, Math.floor(Math.random() * 600)]);
+const environmentCoords = new Map();
+environmentCoords.set('Wall', [1000, Math.floor(Math.random() * 600)]);
+environmentCoords.set('Meteor', [1000, Math.floor(Math.random() * 600)]);
 
 // Spaceship drawing
 var spaceship = new Image();
@@ -38,13 +35,13 @@ function drawGame(){
 
 function drawMeteor(){
     ctx.fillStyle = "green";
-    this.x = meteorCoords.get('Meteor')[0];
-    this.y = meteorCoords.get('Meteor')[1];
+    this.x = environmentCoords.get('Meteor')[0];
+    this.y = environmentCoords.get('Meteor')[1];
     ctx.beginPath();
     ctx.arc(this.x, this.y, 20, 0, Math.PI * 2);
     ctx.fill();
     this.x -= 5;
-    meteorCoords.set('Meteor', [this.x, this.y]);
+    environmentCoords.set('Meteor', [this.x, this.y]);
     if(this.x <= 0){
         resetObstacle('Meteor');
     }
@@ -52,11 +49,11 @@ function drawMeteor(){
 
 function drawWall(){
     ctx.fillStyle = '#ffbb00'
-    this.x = wallCoords.get('Wall')[0];
-    this.y = wallCoords.get('Wall')[1];
+    this.x = environmentCoords.get('Wall')[0];
+    this.y = environmentCoords.get('Wall')[1];
     ctx.fillRect(this.x, this.y, 70, 70);
     this.x -= 2;
-    wallCoords.set('Wall', [this.x, this.y]);
+    environmentCoords.set('Wall', [this.x, this.y]);
     if(this.x <= 0){
         resetObstacle('Wall');
     }
@@ -64,9 +61,9 @@ function drawWall(){
 
 function resetObstacle(obstacle){
     if(obstacle == 'Meteor')
-        meteorCoords.set('Meteor', [1000, Math.floor(Math.random() * 600)]);
+        environmentCoords.set('Meteor', [1000, Math.floor(Math.random() * 600)]);
     if(obstacle == 'Wall')
-        wallCoords.set('Wall', [1000, Math.floor(Math.random() * 600)]);
+        environmentCoords.set('Wall', [1000, Math.floor(Math.random() * 600)]);
 }
 
 function collision(){
@@ -80,11 +77,22 @@ function collision(){
     if(canvas.width - 91 < x)
         x = canvas.width - 91;
     wallCollision();
+    meteorCollision();
+}
+
+function meteorCollision(){
+    this.x = environmentCoords.get('Meteor')[0];
+    this.y = environmentCoords.get('Meteor')[1];
+    // Collision between meteor & ship
+    if(this.x - (20 + 81) <= x && x <= this.x + 20 &&
+       this.y <= y + 60 && y <= this.y + 10){
+        resetObstacle('Meteor');
+    }
 }
 
 function wallCollision(){
-    this.x = wallCoords.get('Wall')[0];
-    this.y = wallCoords.get('Wall')[1];
+    this.x = environmentCoords.get('Wall')[0];
+    this.y = environmentCoords.get('Wall')[1];
     // Collision between wall & ship
     if(this.x - 81 <= x && x <= this.x + 60 &&
        this.y <= y + 30 && y <= this.y + 60){
@@ -98,7 +106,7 @@ function drawSpaceship(){
 
 function clearScreen(){
 //    audio.play(); // Plays the music from the top of the code
-    ctx.fillStyle = "black";
+    ctx.fillStyle = "white";
     ctx.fillRect(0, 0, canvas.clientWidth, canvas.clientHeight);
 }
 
@@ -137,6 +145,10 @@ function keydown(event){
     // Right
     if(event.keyCode == 39 || event.keyCode == 68)
         rightPressed = true;
+    
+    // V Key
+    if(event.keyCode == 86)
+        speed = 1;
 }
 
 function keyup(event){
@@ -155,6 +167,10 @@ function keyup(event){
     // Right
     if(event.keyCode == 39 || event.keyCode == 68)
         rightPressed = false;
+    
+    // V Key
+    if(event.keyCode == 86)
+        speed = 3
 }
 
 drawGame();
