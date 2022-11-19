@@ -2,6 +2,8 @@
  *TODO:
  * clearScreen method audio turned off to mute while testing
  * Clean code before implementing more changes
+ * -Work on implementing multiple meteors/walls to add more obstacles for
+ * -the player to dodge
  */
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -9,15 +11,17 @@ var audio = new Audio("src/Stay Alive Flying.mp3");
 
 let x = 100;
 let y = 100;
-let speed = 5;
+
 let upPressed = false;
 let downPressed = false;
 let leftPressed = false;
 let rightPressed = false;
 
+const unitSpeed = new Map();
 const environmentCoords = new Map();
-environmentCoords.set('Wall', [1000, Math.floor(Math.random() * 600)]);
-environmentCoords.set('Meteor', [1000, Math.floor(Math.random() * 600)]);
+resetObstacle('Wall');        // environmentCoords.set('Wall', [1000, Math.floor(Math.random() * 600)]);
+resetObstacle('Meteor');      // environmentCoords.set('Meteor', [1000, Math.floor(Math.random() * 600)]);
+unitSpeed.set('Ship', 5);
 
 // Spaceship drawing
 var spaceship = new Image();
@@ -40,7 +44,7 @@ function drawMeteor(){
     ctx.beginPath();
     ctx.arc(this.x, this.y, 20, 0, Math.PI * 2);
     ctx.fill();
-    this.x -= 5;
+    this.x -= unitSpeed.get('Meteor');
     environmentCoords.set('Meteor', [this.x, this.y]);
     if(this.x <= 0){
         resetObstacle('Meteor');
@@ -48,11 +52,11 @@ function drawMeteor(){
 }
 
 function drawWall(){
-    ctx.fillStyle = '#ffbb00'
+    ctx.fillStyle = '#ffbb00';
     this.x = environmentCoords.get('Wall')[0];
     this.y = environmentCoords.get('Wall')[1];
     ctx.fillRect(this.x, this.y, 70, 70);
-    this.x -= 2;
+    this.x -= unitSpeed.get('Wall');
     environmentCoords.set('Wall', [this.x, this.y]);
     if(this.x <= 0){
         resetObstacle('Wall');
@@ -60,10 +64,8 @@ function drawWall(){
 }
 
 function resetObstacle(obstacle){
-    if(obstacle == 'Meteor')
-        environmentCoords.set('Meteor', [1000, Math.floor(Math.random() * 600)]);
-    if(obstacle == 'Wall')
-        environmentCoords.set('Wall', [1000, Math.floor(Math.random() * 600)]);
+    environmentCoords.set(obstacle, [1000, Math.floor(Math.random() * 600) + 70]);
+    unitSpeed.set(obstacle, Math.floor(Math.random() * 5) + 1);
 }
 
 function collision(){
@@ -76,6 +78,8 @@ function collision(){
         x = 0;
     if(canvas.width - 91 < x)
         x = canvas.width - 91;
+    
+    // Environmental collisions
     wallCollision();
     meteorCollision();
 }
@@ -113,16 +117,16 @@ function clearScreen(){
 // Check key inputs
 function inputs(){
     if(upPressed){
-        y -= speed;
+        y -= unitSpeed.get('Ship');
     }
     if(downPressed){
-        y += speed;
+        y += unitSpeed.get('Ship');
     }
     if(leftPressed){
-        x -= speed;
+        x -= unitSpeed.get('Ship');
     }
     if(rightPressed){
-        x += speed;
+        x += unitSpeed.get('Ship');
     }
 }
 
@@ -148,7 +152,7 @@ function keydown(event){
     
     // V Key
     if(event.keyCode == 86)
-        speed = 1;
+        unitSpeed.set('Ship', 2);
 }
 
 function keyup(event){
@@ -170,7 +174,7 @@ function keyup(event){
     
     // V Key
     if(event.keyCode == 86)
-        speed = 3
+        unitSpeed.set('Ship', 5);
 }
 
 drawGame();
