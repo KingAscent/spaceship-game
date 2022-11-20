@@ -17,7 +17,9 @@ let rightPressed = false;
 
 const unitSpeed = new Map();
 const environmentCoords = new Map();
-for(let i = 0; i < 3; i++){
+
+let spawnObstacles = 4;
+for(let i = 0; i < spawnObstacles; i++){
     resetObstacle('Meteor' + i);
     resetObstacle('Wall' + i);
 }
@@ -32,7 +34,7 @@ function drawGame(){
     clearScreen();
     inputs();
     collision();
-    for(let i = 0; i < 3; i++){
+    for(let i = 0; i < spawnObstacles; i++){
         drawMeteor(i);
         drawWall(i);
     }
@@ -82,7 +84,7 @@ function collision(){
         x = canvas.width - 91;
     
     // Environmental collisions
-    for(let i = 0; i < 3; i++){
+    for(let i = 0; i < spawnObstacles; i++){
         meteorCollision(i);
         wallCollision(i);
     }
