@@ -2,15 +2,13 @@
  *TODO:
  * clearScreen method audio turned off to mute while testing
  * Clean code before implementing more changes
- * -Work on implementing multiple meteors/walls to add more obstacles for
- * -the player to dodge
  */
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 var audio = new Audio("src/Stay Alive Flying.mp3");
 
 let x = 100;
-let y = 100;
+let y = 375;
 
 let upPressed = false;
 let downPressed = false;
@@ -19,8 +17,10 @@ let rightPressed = false;
 
 const unitSpeed = new Map();
 const environmentCoords = new Map();
-resetObstacle('Wall');        // environmentCoords.set('Wall', [1000, Math.floor(Math.random() * 600)]);
-resetObstacle('Meteor');      // environmentCoords.set('Meteor', [1000, Math.floor(Math.random() * 600)]);
+for(let i = 0; i < 3; i++){
+    resetObstacle('Meteor' + i);
+    resetObstacle('Wall' + i);
+}
 unitSpeed.set('Ship', 5);
 
 // Spaceship drawing
@@ -32,34 +32,36 @@ function drawGame(){
     clearScreen();
     inputs();
     collision();
-    drawMeteor();
-    drawWall();
+    for(let i = 0; i < 3; i++){
+        drawMeteor(i);
+        drawWall(i);
+    }
     drawSpaceship();
 }
 
-function drawMeteor(){
+function drawMeteor(i){
     ctx.fillStyle = "green";
-    this.x = environmentCoords.get('Meteor')[0];
-    this.y = environmentCoords.get('Meteor')[1];
+    this.x = environmentCoords.get('Meteor' + i)[0];
+    this.y = environmentCoords.get('Meteor' + i)[1];
     ctx.beginPath();
     ctx.arc(this.x, this.y, 20, 0, Math.PI * 2);
     ctx.fill();
-    this.x -= unitSpeed.get('Meteor');
-    environmentCoords.set('Meteor', [this.x, this.y]);
+    this.x -= unitSpeed.get('Meteor' + i);
+    environmentCoords.set('Meteor' + i, [this.x, this.y]);
     if(this.x <= 0){
-        resetObstacle('Meteor');
+        resetObstacle('Meteor' + i);
     }
 }
 
-function drawWall(){
+function drawWall(i){
     ctx.fillStyle = '#ffbb00';
-    this.x = environmentCoords.get('Wall')[0];
-    this.y = environmentCoords.get('Wall')[1];
+    this.x = environmentCoords.get('Wall' + i)[0];
+    this.y = environmentCoords.get('Wall' + i)[1];
     ctx.fillRect(this.x, this.y, 70, 70);
-    this.x -= unitSpeed.get('Wall');
-    environmentCoords.set('Wall', [this.x, this.y]);
+    this.x -= unitSpeed.get('Wall' + i);
+    environmentCoords.set('Wall' + i, [this.x, this.y]);
     if(this.x <= 0){
-        resetObstacle('Wall');
+        resetObstacle('Wall' + i);
     }
 }
 
@@ -80,27 +82,29 @@ function collision(){
         x = canvas.width - 91;
     
     // Environmental collisions
-    wallCollision();
-    meteorCollision();
-}
-
-function meteorCollision(){
-    this.x = environmentCoords.get('Meteor')[0];
-    this.y = environmentCoords.get('Meteor')[1];
-    // Collision between meteor & ship
-    if(this.x - (20 + 81) <= x && x <= this.x + 20 &&
-       this.y <= y + 60 && y <= this.y + 10){
-        resetObstacle('Meteor');
+    for(let i = 0; i < 3; i++){
+        meteorCollision(i);
+        wallCollision(i);
     }
 }
 
-function wallCollision(){
-    this.x = environmentCoords.get('Wall')[0];
-    this.y = environmentCoords.get('Wall')[1];
+function meteorCollision(i){
+    this.x = environmentCoords.get('Meteor' + i)[0];
+    this.y = environmentCoords.get('Meteor' + i)[1];
+    // Collision between meteor & ship
+    if(this.x - (20 + 81) <= x && x <= this.x + 20 &&
+       this.y <= y + 60 && y <= this.y + 10){
+        resetObstacle('Meteor' + i);
+    }
+}
+
+function wallCollision(i){
+    this.x = environmentCoords.get('Wall' + i)[0];
+    this.y = environmentCoords.get('Wall' + i)[1];
     // Collision between wall & ship
     if(this.x - 81 <= x && x <= this.x + 60 &&
        this.y <= y + 30 && y <= this.y + 60){
-        resetObstacle('Wall');
+        resetObstacle('Wall' + i);
     }
 }
 
