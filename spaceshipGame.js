@@ -18,7 +18,7 @@ let rightPressed = false;
 const unitSpeed = new Map();
 const environmentCoords = new Map();
 
-let spawnObstacles = 4;
+let spawnObstacles = 6;
 for(let i = 0; i < spawnObstacles; i++){
     resetObstacle('Meteor' + i);
     resetObstacle('Wall' + i);
@@ -28,6 +28,8 @@ unitSpeed.set('Ship', 5);
 // Spaceship drawing
 var spaceship = new Image();
 spaceship.src = "src/spaceship.png";
+var meteor = new Image();
+meteor.src = "src/meteor.png";
 
 function drawGame(){
     requestAnimationFrame(drawGame);
@@ -38,22 +40,21 @@ function drawGame(){
         drawMeteor(i);
         drawWall(i);
     }
+    
     drawSpaceship();
 }
 
 function drawMeteor(i){
-    ctx.fillStyle = "green";
     this.x = environmentCoords.get('Meteor' + i)[0];
     this.y = environmentCoords.get('Meteor' + i)[1];
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, 20, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.drawImage(meteor, this.x, this.y);
     this.x -= unitSpeed.get('Meteor' + i);
     environmentCoords.set('Meteor' + i, [this.x, this.y]);
     if(this.x <= 0){
         resetObstacle('Meteor' + i);
     }
 }
+
 
 function drawWall(i){
     ctx.fillStyle = '#ffbb00';
