@@ -28,19 +28,26 @@ unitSpeed.set('Ship', 5);
 // Spaceship drawing
 var spaceship = new Image();
 spaceship.src = "src/spaceship.png";
+
 var meteor = new Image();
 meteor.src = "src/meteor.png";
+
+var worldBackground = new Image();
+worldBackground.src = "src/testWorldImage2.png";
+let worldx = 1000;
+
 
 function drawGame(){
     requestAnimationFrame(drawGame);
     clearScreen();
+    ctx.drawImage(worldBackground, worldx, 0);
+    worldx -= 0.75;
     inputs();
     collision();
     for(let i = 0; i < spawnObstacles; i++){
         drawMeteor(i);
         drawWall(i);
     }
-    
     drawSpaceship();
 }
 
@@ -50,11 +57,10 @@ function drawMeteor(i){
     ctx.drawImage(meteor, this.x, this.y);
     this.x -= unitSpeed.get('Meteor' + i);
     environmentCoords.set('Meteor' + i, [this.x, this.y]);
-    if(this.x <= 0){
+    if(this.x <= -200){
         resetObstacle('Meteor' + i);
     }
 }
-
 
 function drawWall(i){
     ctx.fillStyle = '#ffbb00';
@@ -63,13 +69,13 @@ function drawWall(i){
     ctx.fillRect(this.x, this.y, 70, 70);
     this.x -= unitSpeed.get('Wall' + i);
     environmentCoords.set('Wall' + i, [this.x, this.y]);
-    if(this.x <= 0){
+    if(this.x <= -200){
         resetObstacle('Wall' + i);
     }
 }
 
 function resetObstacle(obstacle){
-    environmentCoords.set(obstacle, [1000, Math.floor(Math.random() * 600) + 70]);
+    environmentCoords.set(obstacle, [1200, Math.floor(Math.random() * 600) + 70]);
     unitSpeed.set(obstacle, Math.floor(Math.random() * 5) + 1);
 }
 
@@ -117,8 +123,11 @@ function drawSpaceship(){
 
 function clearScreen(){
 //    audio.play(); // Plays the music from the top of the code
-    ctx.fillStyle = "white";
+//    ctx.fillStyle = "white";
     ctx.fillRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+    var outerSpace = new Image();
+    outerSpace.src = "src/outerSpace.png";
+    ctx.drawImage(outerSpace, 0, 0);
 }
 
 // Check key inputs
