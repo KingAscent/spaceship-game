@@ -40,7 +40,7 @@ let worldx = 1000;
 function drawGame(){
     requestAnimationFrame(drawGame);
     clearScreen();
-    ctx.drawImage(worldBackground, worldx, 0);
+    //ctx.drawImage(worldBackground, worldx, 0);
     worldx -= 0.75;
     inputs();
     collision();
