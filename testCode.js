@@ -16,3 +16,16 @@ function drawMeteor(i){
         resetObstacle('Meteor' + i);
     }
 }
+
+// Renamed to drawPanel
+function drawWall(i){
+    ctx.fillStyle = '#ffbb00';
+    this.x = environmentCoords.get('Wall' + i)[0];
+    this.y = environmentCoords.get('Wall' + i)[1];
+    ctx.fillRect(this.x, this.y, 70, 70);
+    this.x -= unitSpeed.get('Wall' + i);
+    environmentCoords.set('Wall' + i, [this.x, this.y]);
+    if(this.x <= -200){
+        resetObstacle('Wall' + i);
+    }
+}

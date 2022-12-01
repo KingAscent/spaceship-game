@@ -21,7 +21,7 @@ const environmentCoords = new Map();
 let spawnObstacles = 6;
 for(let i = 0; i < spawnObstacles; i++){
     resetObstacle('Meteor' + i);
-    resetObstacle('Wall' + i);
+    resetObstacle('Panel' + i);
 }
 unitSpeed.set('Ship', 5);
 
@@ -31,6 +31,9 @@ spaceship.src = "src/spaceship.png";
 
 var meteor = new Image();
 meteor.src = "src/meteor.png";
+
+var panel = new Image();
+panel.src = "src/satellite panel.png";
 
 var worldBackground = new Image();
 worldBackground.src = "src/testWorldImage2.png";
@@ -46,7 +49,7 @@ function drawGame(){
     collision();
     for(let i = 0; i < spawnObstacles; i++){
         drawMeteor(i);
-        drawWall(i);
+        drawPanel(i);
     }
     drawSpaceship();
 }
@@ -62,15 +65,15 @@ function drawMeteor(i){
     }
 }
 
-function drawWall(i){
+function drawPanel(i){
     ctx.fillStyle = '#ffbb00';
-    this.x = environmentCoords.get('Wall' + i)[0];
-    this.y = environmentCoords.get('Wall' + i)[1];
-    ctx.fillRect(this.x, this.y, 70, 70);
-    this.x -= unitSpeed.get('Wall' + i);
-    environmentCoords.set('Wall' + i, [this.x, this.y]);
+    this.x = environmentCoords.get('Panel' + i)[0];
+    this.y = environmentCoords.get('Panel' + i)[1];
+    ctx.drawImage(panel, this.x, this.y);
+    this.x -= unitSpeed.get('Panel' + i);
+    environmentCoords.set('Panel' + i, [this.x, this.y]);
     if(this.x <= -200){
-        resetObstacle('Wall' + i);
+        resetObstacle('Panel' + i);
     }
 }
 
@@ -101,19 +104,19 @@ function meteorCollision(i){
     this.x = environmentCoords.get('Meteor' + i)[0];
     this.y = environmentCoords.get('Meteor' + i)[1];
     // Collision between meteor & ship
-    if(this.x - (20 + 81) <= x && x <= this.x + 20 &&
-       this.y <= y + 60 && y <= this.y + 10){
+    if(this.x - (20 + 81) <= x && x <= this.x + 20 &&   // Front of ship && Back of ship
+       this.y <= y + 70 && y <= this.y + 30){           // Below ship && Above ship
         resetObstacle('Meteor' + i);
     }
 }
 
 function wallCollision(i){
-    this.x = environmentCoords.get('Wall' + i)[0];
-    this.y = environmentCoords.get('Wall' + i)[1];
+    this.x = environmentCoords.get('Panel' + i)[0];
+    this.y = environmentCoords.get('Panel' + i)[1];
     // Collision between wall & ship
-    if(this.x - 81 <= x && x <= this.x + 60 &&
-       this.y <= y + 30 && y <= this.y + 60){
-        resetObstacle('Wall' + i);
+    if(this.x - 81 <= x && x <= this.x + 60 &&      // Front of ship && Back of ship
+       this.y <= y + 30 && y <= this.y + 60){       // Below ship && Above ship
+        resetObstacle('Panel' + i);
     }
 }
 
