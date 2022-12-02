@@ -1,42 +1,35 @@
-/*
- *TODO:
- * clearScreen method audio turned off to mute while testing
- * Clean code before implementing more changes
- */
+// Create the canvas, initialize a font, and initialize the game's music
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 ctx.font = "30px Arial";
-var audio = new Audio("src/Stay Alive Flying.mp3");
+var audio = new Audio("src/Stay Alive Flying.mp3"); // Original Song by me using BeepBox (www.beepbox.co)
 
 // Ship coordinates
 let x = 100;
 let y = 375;
 
+// Variables to check if a movement key is pressed
 let upPressed = false;
 let downPressed = false;
 let leftPressed = false;
 let rightPressed = false;
 
+// Maps to contain the speed and/or coordinates of the game's variables
 const unitSpeed = new Map();
 const environmentCoords = new Map();
 
+// Game settings
 let spawnObstacles = 6;
-SetUpGame();
+setUpGame();
 unitSpeed.set('Ship', 5);
 
-// Spaceship drawing
+// Images preloaded for the game
 var spaceship = new Image();
 spaceship.src = "src/spaceship.png";
-
 var meteor = new Image();
 meteor.src = "src/meteor.png";
-
 var panel = new Image();
 panel.src = "src/satellite panel.png";
-
-var worldBackground = new Image();
-worldBackground.src = "src/testWorldImage2.png";
-let worldx = 1000;
 
 // Player stats at the bottom of the screen
 var lives = 3;
@@ -45,7 +38,9 @@ var panelsDodged = 0;
 var timeStart = Date.now();
 var timeAlive = 0;
 
-function SetUpGame(){
+// NAME: setUpGame()
+// PURPOSE: Initializing the game's settings, reassigning variables if called by gameOver
+function setUpGame(){
     ctx.textAlign = "left";     // Reset the Text Alignment after gameOver() center
     x = 100;
     y = 375;
@@ -57,13 +52,13 @@ function SetUpGame(){
         resetObstacle('Meteor' + i);
         resetObstacle('Panel' + i);
     }
-}
+} // End setUpGame()
 
+// NAME: drawGame()
+// PURPOSE: Draw the game to the canvas
 function drawGame(){
     requestAnimationFrame(drawGame);
     clearScreen();
-    //ctx.drawImage(worldBackground, worldx, 0);
-    //worldx -= 0.75;
     if(0 < lives){
         inputs();
         collision();
@@ -76,8 +71,10 @@ function drawGame(){
     }else{      // The player has ran out of lives
         gameOverScreen();
     }
-}
+} // End drawGame()
 
+// NAME: playerHUD()
+// PURPOSE: Draw the player's HUD at the bottom of the screen
 function playerHUD(){
     this.x = 0;     // To adjust all x values on the HUD at once
     this.y = 780;   // To adjust all y avlues on the HUD at once
@@ -87,8 +84,10 @@ function playerHUD(){
     ctx.fillText("Time Alive: " + timeAlive.toFixed(2), this.x + 150, this.y);
     ctx.fillText("Meteors Dodged: " + meteorsDodged, this.x + 400, this.y);
     ctx.fillText("Satellite Panels Dodged: " + panelsDodged, this.x + 690, this.y);
-}
+} // End playerHUD()
 
+// NAME: gameOverScreen()
+// PURPOSE: If the player reaches a Game Over, display the gameover screen
 function gameOverScreen(){
     this.y = 290;
     ctx.fillStyle = "red";
@@ -106,8 +105,11 @@ function gameOverScreen(){
     ctx.fillText("Want to play again?", canvas.width / 2, this.y + 180)
     ctx.fillText("Hit the spacebar!", canvas.width / 2, this.y + 230);
     inputs();
-}
+} // End gameOverScreen()
 
+// NAME: drawMeteor(i)
+// PURPOSE: Draw a meteor to the canvas
+// PARAMETER: i - Used to differentiate the different meteors
 function drawMeteor(i){
     this.x = environmentCoords.get('Meteor' + i)[0];
     this.y = environmentCoords.get('Meteor' + i)[1];
@@ -118,8 +120,11 @@ function drawMeteor(i){
         meteorsDodged++;
         resetObstacle('Meteor' + i);
     }
-}
+} // End drawMeteor(i)
 
+// NAME: drawPanel(i)
+// PURPOSE: Draw a satellite panel to the canvas
+// PARAMETER: i - Used to differentiate the different panels
 function drawPanel(i){
     ctx.fillStyle = '#ffbb00';
     this.x = environmentCoords.get('Panel' + i)[0];
@@ -131,13 +136,18 @@ function drawPanel(i){
         panelsDodged++;
         resetObstacle('Panel' + i);
     }
-}
+} // End drawPanel(i)
 
+// NAME: resetObstacle(obstacle)
+// PURPOSE: Takes an obstacle or object, and gives it a new initial position and speed
+// PARAMETER: obstacle - Key of the obstacle being changed/reinitialized
 function resetObstacle(obstacle){
     environmentCoords.set(obstacle, [1200, Math.floor(Math.random() * 600) + 70]);
     unitSpeed.set(obstacle, Math.floor(Math.random() * 5) + 1);
-}
+} // End resetObstacle(obstacle)
 
+// NAME: collision()
+// PURPOSE: Check to see if the ship has collided with an object or the game border
 function collision(){
     // Check boundaries of canvas first
     if(y < 0)
@@ -152,10 +162,13 @@ function collision(){
     // Environmental collisions
     for(let i = 0; i < spawnObstacles; i++){
         meteorCollision(i);
-        wallCollision(i);
+        panelCollision(i);
     }
-}
+} // End collision()
 
+// NAME: meteorCollision(i)
+// PURPOSE: Check to see if the player's spaceship has collided with a meteor
+// PARAMETER: i - Used to differentiate the different meteors
 function meteorCollision(i){
     this.x = environmentCoords.get('Meteor' + i)[0];
     this.y = environmentCoords.get('Meteor' + i)[1];
@@ -165,33 +178,42 @@ function meteorCollision(i){
         resetObstacle('Meteor' + i);
         lives--;
     }
-}
+} // End meteorCollision(i)
 
-function wallCollision(i){
+// NAME: panelCollision(i)
+// PURPOSE: Check to see if the player's spaceship has collided with a panel
+// PARAMETER: i - Used to differentiate the different panels
+function panelCollision(i){
     this.x = environmentCoords.get('Panel' + i)[0];
     this.y = environmentCoords.get('Panel' + i)[1];
-    // Collision between wall & ship
+    // Collision between panel & ship
     if(this.x - 81 <= x && x <= this.x + 60 &&      // Front of ship && Back of ship
        this.y <= y + 30 && y <= this.y + 60){       // Below ship && Above ship
         resetObstacle('Panel' + i);
         lives--;
     }
-}
+} // End panelCollision(i)
 
+// NAME: drawSpaceship()
+// PURPOSE: Draw the spaceship to the canvas at coordinates x, y
 function drawSpaceship(){
     ctx.drawImage(spaceship, x, y); 
-}
+} // End drawSpaceship()
 
+// NAME: clearScreen()
+// PURPOSE: Begins playing the audio of the game, creates a blue background for the HUD, and
+//          loads the outerspace background
 function clearScreen(){
-   // audio.play(); // Plays the music from the top of the code
-    ctx.fillStyle = "blue";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    audio.play(); // Plays the music from the top of the code
+    ctx.fillStyle = "blue";                     // HUD Color
+    ctx.fillRect(0, 750, canvas.width, 40);     // HUD Dimensions
     var outerSpace = new Image();
     outerSpace.src = "src/outerSpace.png";
     ctx.drawImage(outerSpace, 0, 0);
-}
+} // End clearScreen()
 
-// Check key inputs
+// NAME: inputs()
+// PURPOSE: If a movement key is pressed, adjust ship's position using its speed
 function inputs(){
     if(upPressed){
         y -= unitSpeed.get('Ship');
@@ -205,11 +227,15 @@ function inputs(){
     if(rightPressed){
         x += unitSpeed.get('Ship');
     }
-}
+} // End inputs()
 
+// Allow keyboard inputs
 document.body.addEventListener('keydown', keydown);
 document.body.addEventListener('keyup', keyup);
 
+// NAME: keydown(event)
+// PURPOSE: Check if a key is pressed
+// Parameter: event - The key that is being pressed
 function keydown(event){
     // Up
     if(event.keyCode == 38 || event.keyCode == 87)
@@ -227,15 +253,18 @@ function keydown(event){
     if(event.keyCode == 39 || event.keyCode == 68)
         rightPressed = true;
     
-    // V Key
-    if(event.keyCode == 86)
+    // V Key or Shift key
+    if(event.keyCode == 86 || event.keyCode == 16)
         unitSpeed.set('Ship', 2);
 
     // Spacebar
     if(lives <= 0 && event.keyCode == 32)
-        SetUpGame();
-}
+        setUpGame();
+} // End keydown(event)
 
+// NAME: keyup(event)
+// PURPOSE: Check if a key has been let go of
+// Parameter: event - The key that has been let go of
 function keyup(event){
     // Up
     if(event.keyCode == 38 || event.keyCode == 87)
@@ -253,9 +282,11 @@ function keyup(event){
     if(event.keyCode == 39 || event.keyCode == 68)
         rightPressed = false;
     
-    // V Key
-    if(event.keyCode == 86)
+    // V Key or Shift key
+    if(event.keyCode == 86 || event.keyCode == 16)
         unitSpeed.set('Ship', 5);
-}
+} // End keyup(event)
 
+
+// Begin the game as the page is loaded
 drawGame();
