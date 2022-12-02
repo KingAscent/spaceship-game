@@ -1,8 +1,19 @@
 body{
+    background: black;
+    color: white;
     text-align: center;
     overflow: hidden; /* To hide the scrollbar */
 }
 
+.loreAndInstructions{
+    float: left;
+    width: 21%;
+}
+
+.game{
+    float: left;
+}
+
 #gameCanvas{
-    border: 4px solid #ffbb00;
+    border: 4px solid blue;
 }
